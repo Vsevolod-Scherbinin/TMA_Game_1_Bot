@@ -1,0 +1,24 @@
+{
+  "name": "tma_game_1_bot",
+  "version": "1.0.0",
+  "description": "TG Bot for TMA_Game_1",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vsevolod-Scherbinin/TMA_Game_1_Bot.git"
+  },
+  "author": "V. Scherbinin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vsevolod-Scherbinin/TMA_Game_1_Bot/issues"
+  },
+  "homepage": "https://github.com/Vsevolod-Scherbinin/TMA_Game_1_Bot#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0",
+    "nodemon": "^3.1.4"
+  }
+}
