@@ -1,8 +1,50 @@
 const TelegramApi = require('node-telegram-bot-api');
 const mongoose = require('mongoose');
+const express = require('express');
+
+const app = express();
+const port = 3200;
+
+app.use(express.json());
+
+const allowedCors = [
+  'http://127.0.0.1:5500',
+  'http://localhost:4000',
+  'http://localhost:3001',
+  'https://vsevolod-scherbinin.github.io',
+];
+
+const cors = (req, res, next) => {
+  const { origin } = req.headers;
+  const requestHeaders = req.headers['access-control-request-headers'];
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  res.header('Access-Control-Allow-Credentials', true);
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    return res.end();
+  }
+  return next();
+};
+
+app.use(cors);
+
+app.get('/getUserData/:userId', async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await User.findOne({ userId });
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
 
 const token = '6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao';
-const ownerId = '180799659';
+const botOwnerId = '180799659';
 
 const bot = new TelegramApi(token, {polling: true});
 
@@ -14,16 +56,6 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model('User', userSchema);
-
-// async function getUserCount() {
-//   try {
-//     const userCount = await User.countDocuments();
-//     console.log(`Количество пользователей: ${userCount}`)
-//     return userCount;
-//   } catch (error) {
-//     console.error('Ошибка при подсчете пользователей:', error);
-//   }
-// }
 
 const options = {
   reply_markup: JSON.stringify({
@@ -41,23 +73,18 @@ bot.on('message', async msg => {
   const text = msg.text;
   const chatId = msg.chat.id;
   const userId = msg.from.id;
-  console.log('text', text);
-  console.log('chatId', chatId);
-  console.log('msg', msg);
+  // console.log('text', text);
+  // console.log('chatId', chatId);
+  // console.log('msg', msg);
 
   if(text.includes('start')) {
     try {
-      // Используем метод create для создания нового пользователя
       const newUser = await User.create({ userId });
-      // return bot.sendMessage(userId, 'Добро пожаловать! Пользователь создан.');
     } catch {}
 
     await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
     return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
   }
-  // if(text === '/info') {
-  //   return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`);
-  // }
 
   if(text === '!info') {
     const userCount = await User.countDocuments();
@@ -82,3 +109,7 @@ bot.on('message', async msg => {
 //       }
 //   }
 // });
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
