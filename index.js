@@ -43,6 +43,14 @@ app.get('/getUserData/:userId', async (req, res) => {
   }
 });
 
+app.get('/users', async (req, res) => {
+  try {
+    res.send('user');
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 const token = '6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao';
 const botOwnerId = '180799659';
 
