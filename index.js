@@ -94,7 +94,7 @@ bot.on('message', async msg => {
     return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
   }
 
-  if(text === '!info') {
+  if(userId === botOwnerId && text === '!info') {
     const userCount = await User.countDocuments();
     return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
   }
