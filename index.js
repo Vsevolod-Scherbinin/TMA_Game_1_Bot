@@ -107,23 +107,6 @@ bot.on('message', async msg => {
   return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
 })
 
-// bot.on('message', async msg => {
-//   const text = msg.text;
-//   const chatId = msg.chat.id;
-
-//   if (text.startsWith('/start')) {
-//       const params = text.split(' ');
-//       const referralId = params[1] ? params[1].split('=')[1] : null;
-
-//       if (referralId) {
-//           await bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`);
-//           // Здесь можно добавить логику для начисления бонусов
-//       } else {
-//           await bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`);
-//       }
-//   }
-// });
-
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
