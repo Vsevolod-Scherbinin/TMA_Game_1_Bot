@@ -60,6 +60,8 @@ mongoose.connect('mongodb://localhost:27017/tma_game_1');
 const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   score: { type: Number, default: 0 },
+  bonusPoints: { type: Number, default: 0 },
+  referrals: { type: Array, default: [] }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -93,8 +95,24 @@ bot.on('message', async msg => {
 
     await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
     if (referralId) {
+      const referrer = await User.findOne({ userId: referralId });
+
+      if (referrer && !referrer.referrals.includes(userId)) {
+        await User.updateOne(
+          { userId: referralId },
+          {
+            $inc: { bonusPoints: 100 }, // Увеличиваем бонусные очки для пригласившего
+            $push: { referrals: userId } // Добавляем ID приглашенного в массив
+          }
+        );
+      } else {
+        console.log('Вы уже получили бонусы за это приглашение');
+      }
+        await User.updateOne(
+          { userId },
+          { $inc: { bonusPoints: 100 } } // Увеличиваем бонусные очки для приглашенного
+        );
       return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
-        // Здесь можно добавить логику для начисления бонусов
     } else {
       return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
     }
