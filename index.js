@@ -60,7 +60,7 @@ mongoose.connect('mongodb://localhost:27017/tma_game_1');
 const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   score: { type: Number, default: 0 },
-  bonusPoints: { type: Number, default: 0 },
+  referenceBonus: { type: Number, default: 0 },
   referrals: { type: Array, default: [] }
 });
 
@@ -101,7 +101,7 @@ bot.on('message', async msg => {
         await User.updateOne(
           { userId: referralId },
           {
-            $inc: { bonusPoints: 100 }, // Увеличиваем бонусные очки для пригласившего
+            $inc: { referenceBonus: 100 }, // Увеличиваем бонусные очки для пригласившего
             $push: { referrals: userId } // Добавляем ID приглашенного в массив
           }
         );
@@ -110,7 +110,7 @@ bot.on('message', async msg => {
       }
         await User.updateOne(
           { userId },
-          { $inc: { bonusPoints: 100 } } // Увеличиваем бонусные очки для приглашенного
+          { $inc: { referenceBonus: 100 } } // Увеличиваем бонусные очки для приглашенного
         );
       return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
     } else {
