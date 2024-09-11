@@ -51,10 +51,9 @@ app.get('/users', async (req, res) => {
   }
 });
 
-const token = '6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao';
 const botOwnerId = '180799659';
 
-const bot = new TelegramApi(token, {polling: true});
+const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
 mongoose.connect('mongodb://localhost:27017/tma_game_1');
 
@@ -89,9 +88,16 @@ bot.on('message', async msg => {
     try {
       const newUser = await User.create({ userId });
     } catch {}
+    const params = text.split(' ');
+    const referralId = params[1] ? params[1].split('=')[1] : null;
 
     await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
-    return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+    if (referralId) {
+      return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
+        // Здесь можно добавить логику для начисления бонусов
+    } else {
+      return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+    }
   }
 
   if(userId === botOwnerId && text === '!info') {
