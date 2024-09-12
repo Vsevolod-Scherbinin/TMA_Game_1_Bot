@@ -97,6 +97,45 @@ bot.on('message', async msg => {
   return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
 })
 
+const channels = ['-1002493343663'];
+console.log('channels', channels);
+
+
+bot.on('my_chat_member', (msg) => {
+  const chatMember = msg;
+  console.log('chatMember', chatMember);
+
+  if (chatMember.new_chat_member.status === 'administrator') {
+    const chatId = chatMember.chat.id;
+    if (!channels.includes(chatId)) {
+      channels.push(chatId);
+      console.log('channels', channels);
+      console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
+    }
+  }
+});
+
+
+  const userId = 653832788; // ID пользователя, который нужно проверить
+
+  bot.getChatMember(channels[0], userId)
+      .then((chatMember) => {
+          if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+            console.log(`Пользователь с ID ${userId} подписан на канал!`);
+          } else {
+            console.log(`Пользователь с ID ${userId} не подписан на канал!`);
+          }
+      })
+      .catch((error) => {
+          console.error('Ошибка при проверке подписки:', error);
+          bot.sendMessage(chatId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
+      });
+
+
+bot.on('polling_error', (err) => {
+  console.log(err);
+});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
