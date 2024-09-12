@@ -57,10 +57,10 @@ async function botLoading() {
   const loadedBotData = await botDataLoad();
   if(loadedBotData) {
     botData = loadedBotData;
-    console.log('Данные загружены', botData);
+    // console.log('Данные загружены', botData);
   } else {
     await createBotInDB();
-    console.log('Данные созданы', botData);
+    // console.log('Данные созданы', botData);
   }
 }
 
@@ -100,8 +100,8 @@ botLoading().then(() => {
           await User.updateOne(
             { userId: referralId },
             {
-              $inc: { referenceBonus: 100 }, // Увеличиваем бонусные очки для пригласившего
-              $push: { referrals: userId } // Добавляем ID приглашенного в массив
+              $inc: { referenceBonus: 100 },
+              $push: { referrals: userId }
             }
           );
         } else {
@@ -109,7 +109,7 @@ botLoading().then(() => {
         }
           await User.updateOne(
             { userId },
-            { $inc: { referenceBonus: 100 } } // Увеличиваем бонусные очки для приглашенного
+            { $inc: { referenceBonus: 100 } }
           );
         return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
       } else {
@@ -124,10 +124,6 @@ botLoading().then(() => {
     return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
   })
 
-  // const channels = ['-1002493343663'];
-  // console.log('channels', channels);
-  // console.log('botData', botData);
-
   bot.on('my_chat_member', async (msg) => {
     const chatMember = msg.new_chat_member.status;
     console.log('msg', msg);
@@ -138,8 +134,8 @@ botLoading().then(() => {
       if (!botData.channels.includes(chatId)) {
         botData.channels.push(chatId);
         await Bot.updateOne(
-          { botId: botData.botId }, // Условие для поиска нужного бота
-          { $set: { channels: botData.channels } } // Обновляем массив channels
+          { botId: botData.botId },
+          { $push: { channels: botData.channels } }
         );
         console.log('botData.channels', botData.channels);
         console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
@@ -148,20 +144,20 @@ botLoading().then(() => {
   });
 
   // --------------- Subscribtion-Check-Start ---------------
-    const userId = 653832788; // ID пользователя, который нужно проверить
+  const userId = 653832788; // ID пользователя, который нужно проверить
 
-    botData.channels.length > 0 && bot.getChatMember(botData.channels[0], userId)
-        .then((chatMember) => {
-            if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
-              console.log(`Пользователь с ID ${userId} подписан на канал!`);
-            } else {
-              console.log(`Пользователь с ID ${userId} не подписан на канал!`);
-            }
-        })
-        .catch((error) => {
-            console.error('Ошибка при проверке подписки:', error);
-            bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
-        });
+  botData.channels.length > 0 && bot.getChatMember(botData.channels[0], userId)
+    .then((chatMember) => {
+      if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+        console.log(`Пользователь с ID ${userId} подписан на канал!`);
+      } else {
+        console.log(`Пользователь с ID ${userId} не подписан на канал!`);
+      }
+    })
+    .catch((error) => {
+      console.error('Ошибка при проверке подписки:', error);
+      bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
+    });
 
   bot.on('polling_error', (err) => {
     console.log(err);
