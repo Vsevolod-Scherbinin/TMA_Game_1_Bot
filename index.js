@@ -64,8 +64,9 @@ async function botLoading() {
   }
 }
 
-function channelSubscribtionCheck(userId) {
-  botData.channels.length > 0 && bot.getChatMember(botData.channels[0], userId)
+// botData.channels[0]
+function channelSubscribtionCheck(channelId, userId) {
+  botData.channels.length > 0 && bot.getChatMember(channelId, userId)
     .then((chatMember) => {
       if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
         console.log(`Пользователь с ID ${userId} подписан на канал!`);
@@ -167,7 +168,22 @@ botLoading().then(() => {
 
   // --------------- Subscribtion-Check-Start ---------------
   // const userId = 653832788; // ID пользователя, который нужно проверить
-  channelSubscribtionCheck(653832788);
+  // channelSubscribtionCheck(botData.channels[0], 653832788);
+  app.post('/checkSubscription', async (req, res) => {
+    const { userId, channelId } = req.body; // Получаем userId и channelId из запроса
+
+    try {
+      const chatMember = await bot.getChatMember(channelId, userId);
+      if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+        res.json({ subscribed: true });
+      } else {
+        res.json({ subscribed: false });
+      }
+    } catch (error) {
+      console.error('Ошибка при проверке подписки:', error);
+      res.status(500).json({ error: 'Ошибка при проверке подписки' });
+    }
+  });
 
   bot.on('polling_error', (err) => {
     console.log(err);
