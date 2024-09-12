@@ -60,12 +60,11 @@ async function botLoading() {
     botData = loadedBotData;
     console.log('Данные загружены', botData);
   } else {
-    createBotInDB();
+    await createBotInDB();
     console.log('Данные созданы', botData);
   }
 }
 botLoading();
-
 
 const options = {
   reply_markup: JSON.stringify({
@@ -118,6 +117,7 @@ bot.on('message', async msg => {
       return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
     }
   }
+
 
   if(userId === botOwnerId && text === '!info') {
     const userCount = await User.countDocuments();
