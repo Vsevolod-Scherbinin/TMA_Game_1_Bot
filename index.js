@@ -2,12 +2,15 @@ const TelegramApi = require('node-telegram-bot-api');
 const mongoose = require('mongoose');
 const express = require('express');
 
+// --------------- Server-Start ---------------
 const app = express();
 const port = 3200;
-
 app.use(express.json());
 const cors = require('./cors');
 app.use(cors);
+
+mongoose.connect('mongodb://localhost:27017/tma_game_1');
+const User = require('./userModel');
 
 app.get('/getUserData/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -26,13 +29,14 @@ app.get('/users', async (req, res) => {
     res.status(500).send(error);
   }
 });
+// --------------- Server-End ---------------
 
+// --------------- Bot-Start ---------------
 const botOwnerId = '180799659';
 
 const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
-mongoose.connect('mongodb://localhost:27017/tma_game_1');
-const User = require('./userModel');
+
 
 const options = {
   reply_markup: JSON.stringify({
