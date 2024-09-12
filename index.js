@@ -10,7 +10,7 @@ const cors = require('./cors');
 app.use(cors);
 
 mongoose.connect('mongodb://localhost:27017/tma_game_1');
-const User = require('./userModel');
+const { User, Bot } = require('./models');
 
 app.get('/getUserData/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -22,13 +22,13 @@ app.get('/getUserData/:userId', async (req, res) => {
   }
 });
 
-app.get('/users', async (req, res) => {
-  try {
-    res.send('user');
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// app.get('/users', async (req, res) => {
+//   try {
+//     res.send('user');
+//   } catch (error) {
+//     res.status(500).send(error);
+//   }
+// });
 // --------------- Server-End ---------------
 
 // --------------- Bot-Start ---------------
