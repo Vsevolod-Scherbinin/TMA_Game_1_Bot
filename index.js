@@ -22,7 +22,6 @@ app.get('/getUserData/:userId', async (req, res) => {
   }
 });
 
-
 // app.get('/users', async (req, res) => {
 //   try {
 //     res.send('user');
@@ -64,106 +63,110 @@ async function botLoading() {
     console.log('Данные созданы', botData);
   }
 }
-botLoading();
 
-const options = {
-  reply_markup: JSON.stringify({
-    inline_keyboard: [
-      [{text: 'Запустить', web_app: { url: 'https://vsevolod-scherbinin.github.io/TMA_Game_1_OOP/' }}]
-    ]
-  })
-}
+botLoading().then(() => {
+  const options = {
+    reply_markup: JSON.stringify({
+      inline_keyboard: [
+        [{text: 'Запустить', web_app: { url: 'https://vsevolod-scherbinin.github.io/TMA_Game_1_OOP/' }}]
+      ]
+    })
+  }
 
-bot.setMyCommands([
-  {command: '/start', description: 'Начать игру'},
-])
+  bot.setMyCommands([
+    {command: '/start', description: 'Начать игру'},
+  ])
 
-bot.on('message', async msg => {
-  const text = msg.text;
-  const chatId = msg.chat.id;
-  const userId = msg.from.id;
-  // console.log('text', text);
-  // console.log('chatId', chatId);
-  // console.log('msg', msg);
+  bot.on('message', async msg => {
+    const text = msg.text;
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    // console.log('text', text);
+    // console.log('chatId', chatId);
+    // console.log('msg', msg);
 
-  if(text.includes('start')) {
-    try {
-      const newUser = await User.create({ userId });
-    } catch {}
-    const params = text.split(' ');
-    const referralId = params[1] ? params[1].split('=')[1] : null;
+    if(text.includes('start')) {
+      try {
+        const newUser = await User.create({ userId });
+      } catch {}
+      const params = text.split(' ');
+      const referralId = params[1] ? params[1].split('=')[1] : null;
 
-    await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
-    if (referralId) {
-      const referrer = await User.findOne({ userId: referralId });
+      await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
+      if (referralId) {
+        const referrer = await User.findOne({ userId: referralId });
 
-      if (referrer && !referrer.referrals.includes(userId)) {
-        await User.updateOne(
-          { userId: referralId },
-          {
-            $inc: { referenceBonus: 100 }, // Увеличиваем бонусные очки для пригласившего
-            $push: { referrals: userId } // Добавляем ID приглашенного в массив
-          }
-        );
+        if (referrer && !referrer.referrals.includes(userId)) {
+          await User.updateOne(
+            { userId: referralId },
+            {
+              $inc: { referenceBonus: 100 }, // Увеличиваем бонусные очки для пригласившего
+              $push: { referrals: userId } // Добавляем ID приглашенного в массив
+            }
+          );
+        } else {
+          console.log('Вы уже получили бонусы за это приглашение');
+        }
+          await User.updateOne(
+            { userId },
+            { $inc: { referenceBonus: 100 } } // Увеличиваем бонусные очки для приглашенного
+          );
+        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
       } else {
-        console.log('Вы уже получили бонусы за это приглашение');
+        return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
       }
-        await User.updateOne(
-          { userId },
-          { $inc: { referenceBonus: 100 } } // Увеличиваем бонусные очки для приглашенного
+    }
+
+    if(userId === botOwnerId && text === '!info') {
+      const userCount = await User.countDocuments();
+      return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
+    }
+    return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
+  })
+
+  // const channels = ['-1002493343663'];
+  // console.log('channels', channels);
+  // console.log('botData', botData);
+
+  bot.on('my_chat_member', async (msg) => {
+    const chatMember = msg.new_chat_member.status;
+    console.log('msg', msg);
+    console.log('chatMember', chatMember);
+
+    if (chatMember === 'administrator') {
+      const chatId = msg.chat.id;
+      if (!botData.channels.includes(chatId)) {
+        botData.channels.push(chatId);
+        await Bot.updateOne(
+          { botId: botData.botId }, // Условие для поиска нужного бота
+          { $set: { channels: botData.channels } } // Обновляем массив channels
         );
-      return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
-    } else {
-      return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+        console.log('botData.channels', botData.channels);
+        console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
+      }
     }
-  }
+  });
 
+  // --------------- Subscribtion-Check-Start ---------------
+    const userId = 653832788; // ID пользователя, который нужно проверить
 
-  if(userId === botOwnerId && text === '!info') {
-    const userCount = await User.countDocuments();
-    return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
-  }
-  return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
-})
+    botData.channels.length > 0 && bot.getChatMember(botData.channels[0], userId)
+        .then((chatMember) => {
+            if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+              console.log(`Пользователь с ID ${userId} подписан на канал!`);
+            } else {
+              console.log(`Пользователь с ID ${userId} не подписан на канал!`);
+            }
+        })
+        .catch((error) => {
+            console.error('Ошибка при проверке подписки:', error);
+            bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
+        });
 
-const channels = ['-1002493343663'];
-console.log('channels', channels);
-
-
-bot.on('my_chat_member', (msg) => {
-  const chatMember = msg.new_chat_member;
-  console.log('chatMember', chatMember);
-
-  if (chatMember.status === 'administrator') {
-    const chatId = chatMember.chat.id;
-    if (!channels.includes(chatId)) {
-      channels.push(chatId);
-      console.log('channels', channels);
-      console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
-    }
-  }
+  bot.on('polling_error', (err) => {
+    console.log(err);
+  });
 });
-
-// --------------- Subscribtion-Check-Start ---------------
-  const userId = 653832788; // ID пользователя, который нужно проверить
-
-  bot.getChatMember(channels[0], userId)
-      .then((chatMember) => {
-          if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
-            console.log(`Пользователь с ID ${userId} подписан на канал!`);
-          } else {
-            console.log(`Пользователь с ID ${userId} не подписан на канал!`);
-          }
-      })
-      .catch((error) => {
-          console.error('Ошибка при проверке подписки:', error);
-          bot.sendMessage(chatId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
-      });
-
-
-// bot.on('polling_error', (err) => {
-//   console.log(err);
-// });
 // --------------- Subscribtion-Check-End ---------------
 // --------------- Bot-End ---------------
 
