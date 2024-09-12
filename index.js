@@ -22,6 +22,7 @@ app.get('/getUserData/:userId', async (req, res) => {
   }
 });
 
+
 // app.get('/users', async (req, res) => {
 //   try {
 //     res.send('user');
@@ -36,6 +37,34 @@ const botOwnerId = '180799659';
 
 const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
+let botData = {};
+
+async function botDataLoad() {
+  const myBot = await bot.getMe();
+  const botData = await Bot.findOne({ botId: myBot.id });
+  return botData;
+}
+
+async function createBotInDB() {
+  const myBot = await bot.getMe();
+  const newBot = await Bot.create({
+    botId: myBot.id,
+    botOwnerId: botOwnerId,
+  });
+  botData = newBot;
+}
+
+async function botLoading() {
+  const loadedBotData = await botDataLoad();
+  if(loadedBotData) {
+    botData = loadedBotData;
+    console.log('Данные загружены', botData);
+  } else {
+    createBotInDB();
+    console.log('Данные созданы', botData);
+  }
+}
+botLoading();
 
 
 const options = {
@@ -102,10 +131,10 @@ console.log('channels', channels);
 
 
 bot.on('my_chat_member', (msg) => {
-  const chatMember = msg;
+  const chatMember = msg.new_chat_member;
   console.log('chatMember', chatMember);
 
-  if (chatMember.new_chat_member.status === 'administrator') {
+  if (chatMember.status === 'administrator') {
     const chatId = chatMember.chat.id;
     if (!channels.includes(chatId)) {
       channels.push(chatId);
@@ -115,7 +144,7 @@ bot.on('my_chat_member', (msg) => {
   }
 });
 
-
+// --------------- Subscribtion-Check-Start ---------------
   const userId = 653832788; // ID пользователя, который нужно проверить
 
   bot.getChatMember(channels[0], userId)
@@ -132,9 +161,11 @@ bot.on('my_chat_member', (msg) => {
       });
 
 
-bot.on('polling_error', (err) => {
-  console.log(err);
-});
+// bot.on('polling_error', (err) => {
+//   console.log(err);
+// });
+// --------------- Subscribtion-Check-End ---------------
+// --------------- Bot-End ---------------
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

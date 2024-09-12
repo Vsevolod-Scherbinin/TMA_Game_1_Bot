@@ -9,11 +9,12 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-const botSchema = new mongoose.Schema({
-  userId: { type: String, unique: true },
+const botDBSchema = new mongoose.Schema({
+  botId: { type: String, unique: true },
+  botOwnerId: { type: String, unique: true },
   channels: { type: Array, default: [] }
 });
 
-const Bot = mongoose.model('Bot', botSchema);
+const Bot = mongoose.model('Bot', botDBSchema);
 
 module.exports = { User, Bot };
