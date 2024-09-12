@@ -32,15 +32,7 @@ const botOwnerId = '180799659';
 const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
 mongoose.connect('mongodb://localhost:27017/tma_game_1');
-
-const userSchema = new mongoose.Schema({
-  userId: { type: String, unique: true },
-  score: { type: Number, default: 0 },
-  referenceBonus: { type: Number, default: 0 },
-  referrals: { type: Array, default: [] }
-});
-
-const User = mongoose.model('User', userSchema);
+const User = require('./userModel');
 
 const options = {
   reply_markup: JSON.stringify({
