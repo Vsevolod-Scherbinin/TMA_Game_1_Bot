@@ -12,7 +12,7 @@ app.use(cors);
 mongoose.connect('mongodb://localhost:27017/tma_game_1');
 const { User, Bot } = require('./models');
 
-app.get('/getUserData/:userId', async (req, res) => {
+app.get('/users/:userId', async (req, res) => {
   const { userId } = req.params;
   try {
     const user = await User.findOne({ userId });
@@ -22,13 +22,36 @@ app.get('/getUserData/:userId', async (req, res) => {
   }
 });
 
-// app.get('/users', async (req, res) => {
+// app.patch('/users', async (req, res) => {
 //   try {
 //     res.send('user');
 //   } catch (error) {
 //     res.status(500).send(error);
 //   }
 // });
+
+app.patch('/users', async (req, res) => {
+  const data = req.body; // Получаем userId и данные пользователя из тела запроса
+  // console.log(req.body);
+
+  try {
+    // Находим пользователя по userId и обновляем его данные
+    const updatedUser = await User.findOneAndUpdate(
+      { userId: data.userId }, // Условие поиска
+      { $set: data }, // Данные для обновления
+      // { new: true } // Возвращаем обновлённый документ
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    }
+
+    res.json(updatedUser); // Возвращаем обновлённые данные пользователя
+  } catch (error) {
+    console.error('Ошибка при обновлении данных пользователя:', error);
+    res.status(500).json({ message: 'Ошибка сервера' });
+  }
+});
 // --------------- Server-End ---------------
 
 // --------------- Bot-Start ---------------
