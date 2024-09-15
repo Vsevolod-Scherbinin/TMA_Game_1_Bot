@@ -133,23 +133,26 @@ botLoading().then(() => {
 
       await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
       if (referralId) {
-        const referrer = await User.findOne({ userId: referralId });
 
-        if (referrer && !referrer.referrals.includes(userId)) {
+        const referrer = await User.findOne({ userId: referralId });
+        console.log(referrer);
+
+        if (referrer && !referrer.friends.includes(userId)) {
           await User.updateOne(
             { userId: referralId },
             {
               $inc: { referenceBonus: 100 },
-              $push: { referrals: userId }
+              $push: { friends: {id: userId} }
             }
           );
+          console.log('Получите бонусы');
         } else {
           console.log('Вы уже получили бонусы за это приглашение');
         }
-          await User.updateOne(
-            { userId },
-            { $inc: { referenceBonus: 100 } }
-          );
+        await User.updateOne(
+          { userId },
+          { $inc: { referenceBonus: 100 } }
+        );
         return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
       } else {
         return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);

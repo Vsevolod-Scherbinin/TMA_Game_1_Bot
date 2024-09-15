@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true },
   score: { type: Number, default: 0 },
   delta: { type: Number, default: 0 },
-  energy: { type: Number, default: 0 },
+  energy: { type: Number, default: 500 },
   cummulativeIncome: { type: Number, default: 0 },
   expences: { type: Number, default: 0 },
   taps: { type: Number, default: 0 },
@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
   achievements: { type: Array, default: [] },
   gatheredAchievements: { type: Array, default: [] },
   referenceBonus: { type: Number, default: 0 },
-  referrals: { type: Array, default: [] },
+  friends: { type: Array, default: [] },
+  channels: { type: Array, default: [] },
 });
 
 const User = mongoose.model('User', userSchema);
