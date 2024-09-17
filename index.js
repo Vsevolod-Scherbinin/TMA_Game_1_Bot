@@ -22,21 +22,28 @@ app.get('/users/:userId', async (req, res) => {
   }
 });
 
-app.get('/users/all', async (req, res) => {
-  const { userId } = req.params;
+app.get('/users_all', async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find();
     res.send(users);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-app.get('/users/count', async (req, res) => {
-  const { userId } = req.params;
+app.get('/users_count', async (req, res) => {
   try {
-    const users = await User.count({});
-    res.send(users);
+    const users = await User.countDocuments();
+    res.send({users});
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+app.get('/users_count', async (req, res) => {
+  try {
+    const count = await User.countDocuments();
+    res.send({ count });
   } catch (error) {
     res.status(500).send(error);
   }
