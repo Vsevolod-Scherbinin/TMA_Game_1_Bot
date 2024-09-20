@@ -141,7 +141,7 @@ botLoading().then(() => {
     const userId = msg.from.id;
     // console.log('text', text);
     // console.log('chatId', chatId);
-    // console.log('msg', msg);
+    console.log('msg', msg);
 
     if(text.includes('start')) {
       try {
@@ -229,12 +229,32 @@ botLoading().then(() => {
       res.status(500).json({ error: 'Ошибка при проверке подписки' });
     }
   });
+  // --------------- Subscribtion-Check-End ---------------
+
+  // --------------- UserPhoto-Start ---------------
+  app.post('/getUserPhoto', async (req, res) => {
+    const { userId } = req.body;
+
+    try {
+      const photos = await bot.getUserProfilePhotos(userId);
+      const photoId = photos.photos[0][0].file_id;
+      console.log(photoId);
+
+      const photo = await bot.getFile(photoId);
+      console.log(photo);
+
+      res.json(photo);
+    } catch (error) {
+      console.error('Ошибка при проверке подписки:', error);
+      res.status(500).json({ error: 'Ошибка при проверке подписки' });
+    }
+  });
+  // --------------- UserPhoto-End ---------------
 
   bot.on('polling_error', (err) => {
     console.log(err);
   });
 });
-// --------------- Subscribtion-Check-End ---------------
 // --------------- Bot-End ---------------
 
 app.listen(port, () => {
