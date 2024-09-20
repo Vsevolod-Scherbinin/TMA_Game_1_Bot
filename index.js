@@ -107,20 +107,20 @@ async function botLoading() {
 }
 
 // botData.channels[0]
-function channelSubscribtionCheck(channelId, userId) {
-  botData.channels.length > 0 && bot.getChatMember(channelId, userId)
-    .then((chatMember) => {
-      if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
-        console.log(`Пользователь с ID ${userId} подписан на канал!`);
-      } else {
-        console.log(`Пользователь с ID ${userId} не подписан на канал!`);
-      }
-    })
-    .catch((error) => {
-      console.error('Ошибка при проверке подписки:', error);
-      bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
-    });
-}
+// function channelSubscribtionCheck(channelId, userId) {
+//   botData.channels.length > 0 && bot.getChatMember(channelId, userId)
+//     .then((chatMember) => {
+//       if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+//         console.log(`Пользователь с ID ${userId} подписан на канал!`);
+//       } else {
+//         console.log(`Пользователь с ID ${userId} не подписан на канал!`);
+//       }
+//     })
+//     .catch((error) => {
+//       console.error('Ошибка при проверке подписки:', error);
+//       bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
+//     });
+// }
 
 botLoading().then(() => {
   const options = {

@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   tasks: { type: Array, default: [] },
   achievements: { type: Array, default: [] },
   gatheredAchievements: { type: Array, default: [] },
+  activeAchievements: { type: Array, default: [] },
   referenceBonus: { type: Number, default: 0 },
   friends: { type: Array, default: [] },
   channels: { type: Array, default: [] },
