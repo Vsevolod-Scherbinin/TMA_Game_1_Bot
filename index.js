@@ -140,7 +140,6 @@ botLoading().then(() => {
         const hasFriend = referrer.friends.some(obj => obj.id === userId);
 
         console.log('userId', userId);
-        bot.sendMessage(`userId`, userId);
 
         if (referrer && !hasFriend) {
           await User.updateOne(
@@ -159,7 +158,7 @@ botLoading().then(() => {
           { userId },
           { $inc: { referenceBonus: 100 } }
         );
-        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}, friends ${refferer.friends}`, options);
+        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
       } else {
         return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
       }
