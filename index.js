@@ -159,7 +159,7 @@ botLoading().then(() => {
           { userId },
           { $inc: { referenceBonus: 100 } }
         );
-        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
+        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}, friends ${refferer.friends}`, options);
       } else {
         return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
       }
