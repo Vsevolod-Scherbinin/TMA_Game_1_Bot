@@ -140,6 +140,7 @@ botLoading().then(() => {
         const hasFriend = referrer.friends.some(obj => obj.id === userId);
 
         console.log('userId', userId);
+        bot.sendMessage(`userId`, userId);
 
         if (referrer && !hasFriend) {
           await User.updateOne(
