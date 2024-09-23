@@ -125,26 +125,29 @@ botLoading().then(() => {
     const userId = msg.from.id;
     // console.log('text', text);
     // console.log('chatId', chatId);
-    console.log('msg', msg);
+    // console.log('msg', msg);
 
     if(text.includes('start')) {
       try {
         const newUser = await User.create({ userId });
       } catch {}
       const params = text.split(' ');
-      const referralId = params[1] ? params[1].split('=')[1] : null;
+      const referrerId = params[1] ? params[1].split('=')[1] : null;
 
       await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
-      if (referralId) {
-        const referrer = await User.findOne({ userId: referralId });
-        console.log(referrer);
+      if (referrerId) {
+        const referrer = await User.findOne({ userId: referrerId });
+        const hasFriend = referrer.friends.some(obj => obj.id === userId);
 
-        if (referrer && !referrer.friends.includes(userId)) {
+        console.log('userId', userId);
+
+        if (referrer && !hasFriend) {
           await User.updateOne(
-            { userId: referralId },
+            { userId: referrerId },
             {
               $inc: { referenceBonus: 100 },
               $addToSet: { friends: {id: userId} }
+              // $addToSet: { friends: {id: userId} }
             }
           );
           console.log('Получите бонусы');
@@ -155,7 +158,7 @@ botLoading().then(() => {
           { userId },
           { $inc: { referenceBonus: 100 } }
         );
-        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referralId}`, options);
+        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
       } else {
         return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
       }
@@ -178,7 +181,7 @@ botLoading().then(() => {
         botData.channels.push(chatId);
         await Bot.updateOne(
           { botId: botData.botId },
-          { $push: { channels: chatId } }
+          { $addToSet: { channels: chatId } }
         );
         console.log('botData.channels', botData.channels);
         console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
@@ -221,10 +224,10 @@ botLoading().then(() => {
     try {
       const photos = await bot.getUserProfilePhotos(userId);
       const photoId = photos.photos[0][0].file_id;
-      console.log(photoId);
+      // console.log(photoId);
 
       const photo = await bot.getFile(photoId);
-      console.log(photo);
+      // console.log(photo);
 
       res.json(photo);
     } catch (error) {
