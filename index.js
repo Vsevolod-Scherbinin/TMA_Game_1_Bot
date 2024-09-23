@@ -74,7 +74,11 @@ app.patch('/users', async (req, res) => {
 // --------------- Server-End ---------------
 
 // --------------- Bot-Start ---------------
-const botOwnerId = '180799659';
+const botOwnersId = ['180799659', '183508678'];
+
+function isOwner(id) {
+  return botOwnersId.some(elem => elem == id);
+}
 
 const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
@@ -90,7 +94,7 @@ async function createBotInDB() {
   const myBot = await bot.getMe();
   const newBot = await Bot.create({
     botId: myBot.id,
-    botOwnerId: botOwnerId,
+    botOwnersId: botOwnersId,
   });
   botData = newBot;
 }
@@ -164,7 +168,7 @@ botLoading().then(() => {
       }
     }
 
-    if(userId === botOwnerId && text === '!info') {
+    if(isOwner(userId) && text === '!info') {
       const userCount = await User.countDocuments();
       return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
     }

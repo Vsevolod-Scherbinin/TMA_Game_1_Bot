@@ -27,7 +27,7 @@ const User = mongoose.model('User', userSchema);
 
 const botDBSchema = new mongoose.Schema({
   botId: { type: String, unique: true },
-  botOwnerId: { type: String, unique: true },
+  botOwnersId: { type: Array, default: [] },
   channels: { type: Array, default: [] }
 });
 
