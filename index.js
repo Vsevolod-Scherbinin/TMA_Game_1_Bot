@@ -106,22 +106,6 @@ async function botLoading() {
   }
 }
 
-// botData.channels[0]
-// function channelSubscribtionCheck(channelId, userId) {
-//   botData.channels.length > 0 && bot.getChatMember(channelId, userId)
-//     .then((chatMember) => {
-//       if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
-//         console.log(`Пользователь с ID ${userId} подписан на канал!`);
-//       } else {
-//         console.log(`Пользователь с ID ${userId} не подписан на канал!`);
-//       }
-//     })
-//     .catch((error) => {
-//       console.error('Ошибка при проверке подписки:', error);
-//       bot.sendMessage(userId, 'Произошла ошибка при проверке подписки. Возможно, пользователь не найден или бот не является администратором канала.');
-//     });
-// }
-
 botLoading().then(() => {
   const options = {
     reply_markup: JSON.stringify({
@@ -152,7 +136,6 @@ botLoading().then(() => {
 
       await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
       if (referralId) {
-
         const referrer = await User.findOne({ userId: referralId });
         console.log(referrer);
 
@@ -161,7 +144,7 @@ botLoading().then(() => {
             { userId: referralId },
             {
               $inc: { referenceBonus: 100 },
-              $push: { friends: {id: userId} }
+              $addToSet: { friends: {id: userId} }
             }
           );
           console.log('Получите бонусы');
