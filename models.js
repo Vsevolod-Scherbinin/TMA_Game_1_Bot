@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema({
   channels: { type: Array, default: [] },
   lastEntry: { type: String, default: '' },
   entryStreak: { type: Number, default: 0 },
+  registryTime: { type: String, default: '' },
+  lastClosure: { type: String, default: '' },
 });
 
 const User = mongoose.model('User', userSchema);
