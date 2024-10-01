@@ -144,6 +144,7 @@ botLoading().then(() => {
         const hasFriend = referrer.friends.some(obj => obj.id === userId);
 
         console.log('userId', userId);
+        // Add Referrer As Friend
 
         if (referrer && !hasFriend) {
           await User.updateOne(
@@ -154,17 +155,22 @@ botLoading().then(() => {
               // $addToSet: { friends: {id: userId} }
             }
           );
+
           console.log('Получите бонусы');
         } else {
           console.log('Вы уже получили бонусы за это приглашение');
         }
-        await User.updateOne(
-          { userId },
-          { $inc: { referenceBonus: 100 } }
-        );
-        return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
-      } else {
-        return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+
+        const userInDb = await User.findOne({ userId: userId });
+        if(!userInDb) {
+          await User.updateOne(
+            { userId },
+            { $inc: { referenceBonus: 100 } }
+          );
+          return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
+        } else {
+          return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+        }
       }
     }
 
