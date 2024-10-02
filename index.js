@@ -74,182 +74,182 @@ app.patch('/users', async (req, res) => {
 // --------------- Server-End ---------------
 
 // --------------- Bot-Start ---------------
-// const botOwnersId = ['180799659', '183508678'];
+const botOwnersId = ['180799659', '183508678'];
 
-// function isOwner(id) {
-//   return botOwnersId.some(elem => elem == id);
-// }
+function isOwner(id) {
+  return botOwnersId.some(elem => elem == id);
+}
 
-// const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
+const bot = new TelegramApi('6750879766:AAFr6iUUudfD_zxG6RE87VbRblR5uRrSTao', {polling: true});
 
-// let botData = {};
+let botData = {};
 
-// async function botDataLoad() {
-//   const myBot = await bot.getMe();
-//   const botData = await Bot.findOne({ botId: myBot.id });
-//   return botData;
-// }
+async function botDataLoad() {
+  const myBot = await bot.getMe();
+  const botData = await Bot.findOne({ botId: myBot.id });
+  return botData;
+}
 
-// async function createBotInDB() {
-//   const myBot = await bot.getMe();
-//   const newBot = await Bot.create({
-//     botId: myBot.id,
-//     botOwnersId: botOwnersId,
-//   });
-//   botData = newBot;
-// }
+async function createBotInDB() {
+  const myBot = await bot.getMe();
+  const newBot = await Bot.create({
+    botId: myBot.id,
+    botOwnersId: botOwnersId,
+  });
+  botData = newBot;
+}
 
-// async function botLoading() {
-//   const loadedBotData = await botDataLoad();
-//   if(loadedBotData) {
-//     botData = loadedBotData;
-//     // console.log('Данные загружены', botData);
-//   } else {
-//     await createBotInDB();
-//     // console.log('Данные созданы', botData);
-//   }
-// }
+async function botLoading() {
+  const loadedBotData = await botDataLoad();
+  if(loadedBotData) {
+    botData = loadedBotData;
+    // console.log('Данные загружены', botData);
+  } else {
+    await createBotInDB();
+    // console.log('Данные созданы', botData);
+  }
+}
 
-// botLoading().then(() => {
-//   const options = {
-//     reply_markup: JSON.stringify({
-//       inline_keyboard: [
-//         [{text: 'Запустить', web_app: { url: 'https://vsevolod-scherbinin.github.io/TMA_Game_1_OOP/' }}]
-//       ]
-//     })
-//   }
+botLoading().then(() => {
+  const options = {
+    reply_markup: JSON.stringify({
+      inline_keyboard: [
+        [{text: 'Запустить', web_app: { url: 'https://vsevolod-scherbinin.github.io/TMA_Game_1_OOP/' }}]
+      ]
+    })
+  }
 
-//   bot.setMyCommands([
-//     {command: '/start', description: 'Начать игру'},
-//   ])
+  bot.setMyCommands([
+    {command: '/start', description: 'Начать игру'},
+  ])
 
-//   bot.on('message', async msg => {
-//     const text = msg.text;
-//     const chatId = msg.chat.id;
-//     const userId = msg.from.id;
-//     // console.log('text', text);
-//     // console.log('chatId', chatId);
-//     // console.log('msg', msg);
+  bot.on('message', async msg => {
+    const text = msg.text;
+    const chatId = msg.chat.id;
+    const userId = msg.from.id;
+    // console.log('text', text);
+    // console.log('chatId', chatId);
+    // console.log('msg', msg);
 
-//     if(text.includes('start')) {
-//       try {
-//       } catch {}
-//       const params = text.split(' ');
-//       const referrerId = params[1] ? params[1].split('=')[1] : null;
+    if(text.includes('start')) {
+      try {
+      } catch {}
+      const params = text.split(' ');
+      const referrerId = params[1] ? params[1].split('=')[1] : null;
 
-//       await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
-//       if (referrerId) {
-//         const referrer = await User.findOne({ userId: referrerId });
-//         const hasFriend = referrer.friends.some(obj => obj.id === userId);
+      await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/bac/a66/baca6623-5f6a-3ab2-af07-b477d91e297a/8.webp');
+      if (referrerId) {
+        const referrer = await User.findOne({ userId: referrerId });
+        const hasFriend = referrer.friends.some(obj => obj.id === userId);
 
-//         console.log('userId', userId);
-//         // Add Referrer As Friend
+        console.log('userId', userId);
+        // Add Referrer As Friend
 
-//         if (referrer && !hasFriend) {
-//           await User.updateOne(
-//             { userId: referrerId },
-//             {
-//               $inc: { referenceBonus: 100 },
-//               $addToSet: { friends: {id: userId} }
-//               // $addToSet: { friends: {id: userId} }
-//             }
-//           );
+        if (referrer && !hasFriend) {
+          await User.updateOne(
+            { userId: referrerId },
+            {
+              $inc: { referenceBonus: 100 },
+              $addToSet: { friends: {id: userId} }
+              // $addToSet: { friends: {id: userId} }
+            }
+          );
 
-//           console.log('Получите бонусы');
-//         } else {
-//           console.log('Вы уже получили бонусы за это приглашение');
-//         }
+          console.log('Получите бонусы');
+        } else {
+          console.log('Вы уже получили бонусы за это приглашение');
+        }
 
-//         const userInDb = await User.findOne({ userId: userId });
-//         if(!userInDb) {
-//           await User.updateOne(
-//             { userId },
-//             { $inc: { referenceBonus: 100 } }
-//           );
-//           return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
-//         } else {
-//           return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
-//         }
-//       }
-//     }
+        const userInDb = await User.findOne({ userId: userId });
+        if(!userInDb) {
+          await User.updateOne(
+            { userId },
+            { $inc: { referenceBonus: 100 } }
+          );
+          return bot.sendMessage(chatId, `Добро пожаловать! Вы пришли по приглашению пользователя с ID: ${referrerId}`, options);
+        } else {
+          return bot.sendMessage(chatId, `Добро пожаловать! Играй и заработай как можно больше очков!`, options);
+        }
+      }
+    }
 
-//     if(isOwner(userId) && text === '!info') {
-//       const userCount = await User.countDocuments();
-//       return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
-//     }
-//     return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
-//   })
+    if(isOwner(userId) && text === '!info') {
+      const userCount = await User.countDocuments();
+      return bot.sendMessage(userId, `Количество пользователей: ${userCount}`);
+    }
+    return bot.sendMessage(chatId, `Я вас не понимаю. Попробуйте воспользоваться командами.`);
+  })
 
-//   bot.on('my_chat_member', async (msg) => {
-//     const chatMember = msg.new_chat_member.status;
-//     // console.log('msg', msg);
-//     // console.log('chatMember', chatMember);
-//     const chatId = msg.chat.id;
-//     if (chatMember === 'administrator') {
-//       if (!botData.channels.includes(chatId)) {
-//         botData.channels.push(chatId);
-//         await Bot.updateOne(
-//           { botId: botData.botId },
-//           { $addToSet: { channels: chatId } }
-//         );
-//         console.log('botData.channels', botData.channels);
-//         console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
-//       }
-//     } else {
-//       botData.channels.pull(chatId);
-//       await Bot.updateOne(
-//         { botId: botData.botId },
-//         { $pull: { channels: chatId } }
-//       );
-//       console.log('botData.channels', botData.channels);
-//       console.log(`Бот удалён из канала. ID канала: ${chatId}`);
-//     }
-//   });
+  bot.on('my_chat_member', async (msg) => {
+    const chatMember = msg.new_chat_member.status;
+    // console.log('msg', msg);
+    // console.log('chatMember', chatMember);
+    const chatId = msg.chat.id;
+    if (chatMember === 'administrator') {
+      if (!botData.channels.includes(chatId)) {
+        botData.channels.push(chatId);
+        await Bot.updateOne(
+          { botId: botData.botId },
+          { $addToSet: { channels: chatId } }
+        );
+        console.log('botData.channels', botData.channels);
+        console.log(`Бот добавлен в новый канал. ID канала: ${chatId}`);
+      }
+    } else {
+      botData.channels.pull(chatId);
+      await Bot.updateOne(
+        { botId: botData.botId },
+        { $pull: { channels: chatId } }
+      );
+      console.log('botData.channels', botData.channels);
+      console.log(`Бот удалён из канала. ID канала: ${chatId}`);
+    }
+  });
 
-//   // --------------- Subscribtion-Check-Start ---------------
-//   // const userId = 653832788; // ID пользователя, который нужно проверить
-//   // channelSubscribtionCheck(botData.channels[0], 653832788);
-//   app.post('/checkSubscription', async (req, res) => {
-//     const { userId, channelId } = req.body; // Получаем userId и channelId из запроса
+  // --------------- Subscribtion-Check-Start ---------------
+  // const userId = 653832788; // ID пользователя, который нужно проверить
+  // channelSubscribtionCheck(botData.channels[0], 653832788);
+  app.post('/checkSubscription', async (req, res) => {
+    const { userId, channelId } = req.body; // Получаем userId и channelId из запроса
 
-//     try {
-//       const chatMember = await bot.getChatMember(channelId, userId);
-//       if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
-//         res.json({ subscribed: true });
-//       } else {
-//         res.json({ subscribed: false });
-//       }
-//     } catch (error) {
-//       console.error('Ошибка при проверке подписки:', error);
-//       res.status(500).json({ error: 'Ошибка при проверке подписки' });
-//     }
-//   });
-//   // --------------- Subscribtion-Check-End ---------------
+    try {
+      const chatMember = await bot.getChatMember(channelId, userId);
+      if (chatMember.status === 'member' || chatMember.status === 'administrator' || chatMember.status === 'creator') {
+        res.json({ subscribed: true });
+      } else {
+        res.json({ subscribed: false });
+      }
+    } catch (error) {
+      console.error('Ошибка при проверке подписки:', error);
+      res.status(500).json({ error: 'Ошибка при проверке подписки' });
+    }
+  });
+  // --------------- Subscribtion-Check-End ---------------
 
-//   // --------------- UserPhoto-Start ---------------
-//   app.post('/getUserPhoto', async (req, res) => {
-//     const { userId } = req.body;
+  // --------------- UserPhoto-Start ---------------
+  app.post('/getUserPhoto', async (req, res) => {
+    const { userId } = req.body;
 
-//     try {
-//       const photos = await bot.getUserProfilePhotos(userId);
-//       const photoId = photos.photos[0][0].file_id;
-//       // console.log(photoId);
+    try {
+      const photos = await bot.getUserProfilePhotos(userId);
+      const photoId = photos.photos[0][0].file_id;
+      // console.log(photoId);
 
-//       const photo = await bot.getFile(photoId);
-//       // console.log(photo);
+      const photo = await bot.getFile(photoId);
+      // console.log(photo);
 
-//       res.json(photo);
-//     } catch (error) {
-//       console.error('Ошибка при проверке подписки:', error);
-//       res.status(500).json({ error: 'Ошибка при проверке подписки' });
-//     }
-//   });
-//   // --------------- UserPhoto-End ---------------
+      res.json(photo);
+    } catch (error) {
+      console.error('Ошибка при проверке подписки:', error);
+      res.status(500).json({ error: 'Ошибка при проверке подписки' });
+    }
+  });
+  // --------------- UserPhoto-End ---------------
 
-//   bot.on('polling_error', (err) => {
-//     console.log(err);
-//   });
-// });
+  bot.on('polling_error', (err) => {
+    console.log(err);
+  });
+});
 // --------------- Bot-End ---------------
 
 app.listen(port, () => {
