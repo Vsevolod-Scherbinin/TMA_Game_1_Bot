@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
   activeAchievements: { type: Array, default: [] },
   referenceBonus: { type: Number, default: 0 },
   friends: { type: Array, default: [] },
+  friendsGathered: { type: Array, default: [] },
   channels: { type: Array, default: [] },
   lastEntry: { type: String, default: '' },
   entryStreak: { type: Number, default: 0 },
